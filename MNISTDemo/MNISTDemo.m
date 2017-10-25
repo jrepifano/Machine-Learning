@@ -1,0 +1,113 @@
+clc; clear all;
+
+
+
+[images labels] = readMNIST('train-images.idx3-ubyte', 'train-labels.idx1-ubyte', 500, 0);
+
+images = reshape(images,500,400);
+
+
+
+mlp = feedforwardnet(10);
+net = train(mlp,images',labels');
+%view(net)
+y = net(images');
+z = postprocess(y);
+Y = round(z',0);
+perf = perform(net,labels',Y);
+flabels = convertlabels(labels);
+foutput = convertlabels(Y);
+plotconfusion(flabels, foutput, 'Classifications and Missclassifications');
+
+function x = postprocess(output)
+output = output';
+for i = 1:length(output)
+   if(output(i) < 0)
+       output(i) = 0;
+   elseif(output(i) > 9)
+       output(i) = 9;
+   end
+   x = output;
+end
+end
+
+function x = convertlabels(labels)
+flabels = zeros(1000,10);
+for i = 1:length(labels)
+   y = labels(i)+1;
+   flabels(i,y) = flabels(i,y)+1;
+end
+x = flabels;
+end
+
+
+
+function [imgs labels] = readMNIST(imgFile, labelFile, readDigits, offset)
+    
+    % Read digits
+    fid = fopen(imgFile, 'r', 'b');
+    header = fread(fid, 1, 'int32');
+    if header ~= 2051
+        error('Invalid image file header'),0;
+    end
+    count = fread(fid, 1, 'int32');
+    if count < readDigits+offset
+        error('Trying to read too many digits');
+    end
+    
+    h = fread(fid, 1, 'int32');
+    w = fread(fid, 1, 'int32');
+    
+    if offset > 0
+        fseek(fid, w*h*offset, 'cof');
+    end
+    
+    imgs = zeros([h w readDigits]);
+    
+    for i=1:readDigits
+        for y=1:h
+            imgs(y,:,i) = fread(fid, w, 'uint8');
+        end
+    end
+    
+    fclose(fid);
+
+    % Read digit labels
+    fid = fopen(labelFile, 'r', 'b');
+    header = fread(fid, 1, 'int32');
+    if header ~= 2049
+        error('Invalid label file header');
+    end
+    count = fread(fid, 1, 'int32');
+    if count < readDigits+offset
+        error('Trying to read too many digits');
+    end
+    
+    if offset > 0
+        fseek(fid, offset, 'cof');
+    end
+    
+    labels = fread(fid, readDigits, 'uint8');
+    fclose(fid);
+    
+    % Calc avg digit and count
+    imgs = trimDigits(imgs, 4);
+    imgs = normalizePixValue(imgs);
+    %[avg num stddev] = getDigitStats(imgs, labels);
+    
+end
+
+function digits = trimDigits(digitsIn, border)
+    dSize = size(digitsIn);
+    digits = zeros([dSize(1)-(border*2) dSize(2)-(border*2) dSize(3)]);
+    for i=1:dSize(3)
+        digits(:,:,i) = digitsIn(border+1:dSize(1)-border, border+1:dSize(2)-border, i);
+    end
+end
+
+function digits = normalizePixValue(digits)
+    digits = double(digits);
+    for i=1:size(digits, 3)
+        digits(:,:,i) = digits(:,:,i)./255.0;
+    end
+end
