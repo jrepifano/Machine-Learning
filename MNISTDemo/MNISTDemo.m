@@ -1,38 +1,30 @@
 clc; clear all;
 
+images = loadMNISTImages('train-images.idx3-ubyte');
+labels = loadMNISTLabels('train-labels.idx1-ubyte');
 
+for i = 1:784
+    if(images(i,1) == 0)
+        images(i,1) = 0.0000001;
+    end
+end
 
-[images labels] = readMNIST('train-images.idx3-ubyte', 'train-labels.idx1-ubyte', 500, 0);
+labels = convertlabels(labels);
 
-images = reshape(images,500,400);
-
-
-
-mlp = feedforwardnet(10);
-net = train(mlp,images',labels');
+mlp = feedforwardnet(50);
+net = train(mlp,images,labels','useGPU','yes','showResources','yes');
 %view(net)
-y = net(images');
-z = postprocess(y);
-Y = round(z',0);
-perf = perform(net,labels',Y);
-flabels = convertlabels(labels);
-foutput = convertlabels(Y);
-plotconfusion(flabels, foutput, 'Classifications and Missclassifications');
+y = net(images);
+Y = round(y',0);
+perf = perform(net,labels',Y');
+plotconfusion(labels', Y', 'Classifications and Missclassifications');
 
-function x = postprocess(output)
-output = output';
-for i = 1:length(output)
-   if(output(i) < 0)
-       output(i) = 0;
-   elseif(output(i) > 9)
-       output(i) = 9;
-   end
-   x = output;
-end
-end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function x = convertlabels(labels)
-flabels = zeros(1000,10);
+flabels = zeros(60000,10);
 for i = 1:length(labels)
    y = labels(i)+1;
    flabels(i,y) = flabels(i,y)+1;
@@ -41,73 +33,50 @@ x = flabels;
 end
 
 
+function images = loadMNISTImages(filename)
+%loadMNISTImages returns a 28x28x[number of MNIST images] matrix containing
+%the raw MNIST images
 
-function [imgs labels] = readMNIST(imgFile, labelFile, readDigits, offset)
-    
-    % Read digits
-    fid = fopen(imgFile, 'r', 'b');
-    header = fread(fid, 1, 'int32');
-    if header ~= 2051
-        error('Invalid image file header'),0;
-    end
-    count = fread(fid, 1, 'int32');
-    if count < readDigits+offset
-        error('Trying to read too many digits');
-    end
-    
-    h = fread(fid, 1, 'int32');
-    w = fread(fid, 1, 'int32');
-    
-    if offset > 0
-        fseek(fid, w*h*offset, 'cof');
-    end
-    
-    imgs = zeros([h w readDigits]);
-    
-    for i=1:readDigits
-        for y=1:h
-            imgs(y,:,i) = fread(fid, w, 'uint8');
-        end
-    end
-    
-    fclose(fid);
+fp = fopen(filename, 'rb');
+assert(fp ~= -1, ['Could not open ', filename, '']);
 
-    % Read digit labels
-    fid = fopen(labelFile, 'r', 'b');
-    header = fread(fid, 1, 'int32');
-    if header ~= 2049
-        error('Invalid label file header');
-    end
-    count = fread(fid, 1, 'int32');
-    if count < readDigits+offset
-        error('Trying to read too many digits');
-    end
-    
-    if offset > 0
-        fseek(fid, offset, 'cof');
-    end
-    
-    labels = fread(fid, readDigits, 'uint8');
-    fclose(fid);
-    
-    % Calc avg digit and count
-    imgs = trimDigits(imgs, 4);
-    imgs = normalizePixValue(imgs);
-    %[avg num stddev] = getDigitStats(imgs, labels);
-    
+magic = fread(fp, 1, 'int32', 0, 'ieee-be');
+assert(magic == 2051, ['Bad magic number in ', filename, '']);
+
+numImages = fread(fp, 1, 'int32', 0, 'ieee-be');
+numRows = fread(fp, 1, 'int32', 0, 'ieee-be');
+numCols = fread(fp, 1, 'int32', 0, 'ieee-be');
+
+images = fread(fp, inf, 'unsigned char');
+images = reshape(images, numCols, numRows, numImages);
+images = permute(images,[2 1 3]);
+
+fclose(fp);
+
+% Reshape to #pixels x #examples
+images = reshape(images, size(images, 1) * size(images, 2), size(images, 3));
+% Convert to double and rescale to [0,1]
+images = double(images) / 255;
+
 end
 
-function digits = trimDigits(digitsIn, border)
-    dSize = size(digitsIn);
-    digits = zeros([dSize(1)-(border*2) dSize(2)-(border*2) dSize(3)]);
-    for i=1:dSize(3)
-        digits(:,:,i) = digitsIn(border+1:dSize(1)-border, border+1:dSize(2)-border, i);
-    end
+function labels = loadMNISTLabels(filename)
+%loadMNISTLabels returns a [number of MNIST images]x1 matrix containing
+%the labels for the MNIST images
+
+fp = fopen(filename, 'rb');
+assert(fp ~= -1, ['Could not open ', filename, '']);
+
+magic = fread(fp, 1, 'int32', 0, 'ieee-be');
+assert(magic == 2049, ['Bad magic number in ', filename, '']);
+
+numLabels = fread(fp, 1, 'int32', 0, 'ieee-be');
+
+labels = fread(fp, inf, 'unsigned char');
+
+assert(size(labels,1) == numLabels, 'Mismatch in label count');
+
+fclose(fp);
+
 end
 
-function digits = normalizePixValue(digits)
-    digits = double(digits);
-    for i=1:size(digits, 3)
-        digits(:,:,i) = digits(:,:,i)./255.0;
-    end
-end
