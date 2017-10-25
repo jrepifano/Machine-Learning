@@ -1,7 +1,10 @@
 clc; clear all;
-
+tic;
 images = loadMNISTImages('train-images.idx3-ubyte');
 labels = loadMNISTLabels('train-labels.idx1-ubyte');
+
+testimages = loadMNISTImages('t10k-images.idx3-ubyte');
+testlabels = loadMNISTLabels('t10k-labels.idx1-ubyte');
 
 for i = 1:784
     if(images(i,1) == 0)
@@ -9,22 +12,42 @@ for i = 1:784
     end
 end
 
-labels = convertlabels(labels);
+for i = 1:784
+    if(testimages(i,1) == 0)
+        testimages(i,1) = 0.0000001;
+    end
+end
 
-mlp = feedforwardnet(50);
+labels = convertlabels(labels);
+testlabels = converttestlabels(testlabels);
+
+
+
+
+
+mlp = feedforwardnet(300);
 net = train(mlp,images,labels','useGPU','yes','showResources','yes');
 %view(net)
-y = net(images);
-Y = round(y',0);
-perf = perform(net,labels',Y');
-plotconfusion(labels', Y', 'Classifications and Missclassifications');
+y = net(testimages);
+perf = perform(net,testlabels',y);
+plotconfusion(testlabels', y, 'Classifications and Missclassifications');
 
-
+elapsedtime = toc;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 function x = convertlabels(labels)
 flabels = zeros(60000,10);
+for i = 1:length(labels)
+   y = labels(i)+1;
+   flabels(i,y) = flabels(i,y)+1;
+end
+x = flabels;
+end
+
+function x = converttestlabels(labels)
+flabels = zeros(10000,10);
 for i = 1:length(labels)
    y = labels(i)+1;
    flabels(i,y) = flabels(i,y)+1;
