@@ -25,7 +25,7 @@ testlabels = converttestlabels(testlabels);
 
 
 
-mlp = feedforwardnet(300);
+mlp = feedforwardnet(1000);
 net = train(mlp,images,labels','useGPU','yes','showResources','yes');
 %view(net)
 y = net(testimages);

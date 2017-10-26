@@ -1,9 +1,9 @@
 clc;clear all;
 
-net = load('net300.mat');
+net = load('net1000.mat');
 net = getfield(net,'net');
 
-testimage = imread('testimage9.png');
+testimage = imread('testimage3.png');
 testimage = rgb2gray(testimage);
 testimage = uint8(255)-testimage;
 testimage = imbinarize(testimage);
