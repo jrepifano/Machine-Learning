@@ -4,11 +4,19 @@ Y = mvnrnd([4 3], [1 1], 100);
 
 Z = vertcat(X,Y);
 
-x = [1 10];
-y = [10 1];
+x = [0 00];
+y = [8 8];
 mus = [];
-H = 50;
+H = 10;
 j = 0;
+figure
+hold on
+plot(X(:,1),X(:,2),'.'); %plot
+plot(Y(:,1),Y(:,2),'+');
+title('K-Means Unsupervised Learning');
+plot(x(:,1),x(:,2),'x','linewidth',8); %plot
+plot(y(:,1),y(:,2),'x','linewidth',8);
+axis([0 8 0 8]);
 while(H > 1)
 classx = [];
 classy = [];
@@ -25,15 +33,18 @@ mus = [mus;x];
 x = mean(classx);
 y = mean(classy);
 H = H -1;
-end
-
 
 figure
 hold on
 plot(X(:,1),X(:,2),'.'); %plot
 plot(Y(:,1),Y(:,2),'+');
-title('Training Data');
+title('K-Means Unsupervised Learning');
 plot(x(:,1),x(:,2),'x','linewidth',8); %plot
 plot(y(:,1),y(:,2),'x','linewidth',8);
+axis([0 8 0 8]);
+
+end
+
+
 
 hold off

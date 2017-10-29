@@ -18,6 +18,6 @@ z = max(y);
 for i = 1:length(y)
     if(y(i) == z)
         x = i-1;
-        fprintf("The number you drew was: " + x + " with probability: " + z +"\n");   
+        fprintf("The number you drew was: " + x + " with likelihood: " + z +"\n");   
     end
 end
