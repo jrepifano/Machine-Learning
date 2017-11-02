@@ -14,7 +14,7 @@ z = vertcat(x,y);
 Y = [ones(100,1);-ones(100,1)];
 
 
-vsvmmodel = fitcsvm(z,Y,'Standardize',true,'KernelFunction','RBF','KernelScale','auto');
+vsvmmodel = fitcsvm(z,Y,'Standardize',true,'KernelFunction','RBF','KernelScale',0.1);
 
 prediction = predict(vsvmmodel,z);
 c1 = [];
