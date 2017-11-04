@@ -12,4 +12,4 @@ mlp.layers{1}.transferFcn = 'purelin';
 net = train(mlp,X',labels');
 view(net)
 y = net(X');
-perf = perform(net,labels,y);
+perf = perform(net,labels',y);
