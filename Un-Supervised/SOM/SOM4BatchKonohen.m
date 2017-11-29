@@ -6,9 +6,9 @@ Z = vertcat(X,Y);
 
 com = mean([Z(:,1) Z(:,2)]);
 
-% neurons = mvnrnd([5 5], [5 5], 9); %Bad neuron initialization
+neurons = mvnrnd([5 5], [5 5], 9); %Bad neuron initialization
 
-neurons = mvnrnd([com(1) com(2)], [1 1], 9); %Good neuron initialization
+% neurons = mvnrnd([com(1) com(2)], [1 1], 9); %Good neuron initialization
 
 figure
 hold on
