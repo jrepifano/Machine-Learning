@@ -1,3 +1,4 @@
+%Gaussian Mixture Model
 clear all; clc;
 X = mvnrnd([2 5], [1 1], 100); %OG data
 Y = mvnrnd([4 3], [1 1], 100);
@@ -7,24 +8,19 @@ Z1 = Z(:,1);
 Z2 = Z(:,2);
 
 
-meanx1 = mean(X); %calculate averages for each class
-meanx2 = mean(Y);
+mux = [0 0];
+muy = [8 8];
+stdx = [1 1];
+stdy = [1 1];
 
-sigmax1 = std(X); %calculate sigma for each class
-sigmax2 = std(Y);
 
-x = [0 00];
-y = [8 8];
-mus = [];
 H = 10;
-j = 0;
 
 hold on
-plot(X(:,1),X(:,2),'.'); %plot
-plot(Y(:,1),Y(:,2),'+');
+plot(Z(:,1),Z(:,2),'.'); %plot
 title('GMM');
-plot(x(:,1),x(:,2),'x','linewidth',8); %plot
-plot(y(:,1),y(:,2),'x','linewidth',8);
+plot(mux(:,1),mux(:,2),'x','linewidth',8); %plot
+plot(muy(:,1),muy(:,2),'x','linewidth',8);
 axis([0 8 0 8]);
 hold off
 
@@ -33,10 +29,10 @@ classx = [];
 classy = [];
 for i = 1:length(Z)
     
-    Px11 = normpdf(Z1(i),meanx1(:,1),sigmax1(:,1)); %Calculate likelyhood for each feature, for each class
-    Px12 = normpdf(Z2(i),meanx1(:,2),sigmax1(:,2));
-    Px21 = normpdf(Z1(i),meanx2(:,1),sigmax2(:,1));
-    Px22 = normpdf(Z2(i),meanx2(:,2),sigmax2(:,2));
+    Px11 = normpdf(Z1(i),mux(:,1),stdx(:,1)); %Calculate likelyhood for each feature, for each class
+    Px12 = normpdf(Z2(i),mux(:,2),stdx(:,2));
+    Px21 = normpdf(Z1(i),muy(:,1),stdy(:,1));
+    Px22 = normpdf(Z2(i),muy(:,2),stdy(:,2));
     
     probx1 = Px11 * Px12; %Since we assume independence, the total probability is the union between both features
     probx2 = Px21 * Px22;
@@ -54,11 +50,11 @@ for i = 1:length(Z)
 
     
 end
-mus = [mus;x];
-xmean = mean(classx);
-ymean = mean(classy);
-xstd = std(classx);
-ystd = std(classy);
+
+mux = mean(classx);
+muy = mean(classy);
+stdx = std(classx);
+stdy = std(classy);
 H = H -1 ;
 
 end
@@ -70,18 +66,18 @@ plot(Y(:,1),Y(:,2),'+');
 
 title('GMM Clustering');
 
-plot(xmean(:,1),xmean(:,2),'x','linewidth',8); %plot
+plot(mux(:,1),mux(:,2),'x','linewidth',8); %plot
 
-plot(ymean(:,1),ymean(:,2),'x','linewidth',8);
+plot(muy(:,1),muy(:,2),'x','linewidth',8);
 
-circle2(xmean(1),xmean(2),xstd(1)*.5,xstd(2)*.5);
-circle2(ymean(1),ymean(2),ystd(1)*.5,ystd(2)*.5);
+circle2(mux(1),mux(2),stdx(1)*.5,stdx(2)*.5);
+circle2(muy(1),muy(2),stdy(1)*.5,stdy(2)*.5);
 
-circle2(xmean(1),xmean(2),xstd(1),xstd(2));
-circle2(ymean(1),ymean(2),ystd(1),ystd(2));
+circle2(mux(1),mux(2),stdx(1),stdx(2));
+circle2(muy(1),muy(2),stdy(1),stdy(2));
 
-circle2(xmean(1),xmean(2),xstd(1)*2,xstd(2)*2);
-circle2(ymean(1),ymean(2),ystd(1)*2,ystd(2)*2);
+circle2(mux(1),mux(2),stdx(1)*2,stdx(2)*2);
+circle2(muy(1),muy(2),stdy(1)*2,stdy(2)*2);
 
 axis([0 8 0 8]);
 hold off
