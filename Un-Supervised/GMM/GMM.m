@@ -61,8 +61,8 @@ end
 
 figure
 hold on
-plot(X(:,1),X(:,2),'.'); %plot
-plot(Y(:,1),Y(:,2),'+');
+plot(classx(:,1),classx(:,2),'.'); %plot
+plot(classy(:,1),classy(:,2),'+');
 
 title('GMM Clustering');
 
@@ -80,6 +80,18 @@ circle2(mux(1),mux(2),stdx(1)*2,stdx(2)*2);
 circle2(muy(1),muy(2),stdy(1)*2,stdy(2)*2);
 
 axis([0 8 0 8]);
+hold off
+
+data = [X;Y];
+
+GMModel = fitgmdist(Z,2);
+figure
+y = [zeros(100,1);ones(100,1)];
+h = gscatter(data(:,1),data(:,2),y);
+hold on
+ezcontour(@(x1,x2)pdf(GMModel,[x1 x2]),get(gca,{'XLim','YLim'}))
+title('{\bf Scatter Plot and Fitted Gaussian Mixture Contours}')
+legend(h,'Model 0','Model1')
 hold off
 
 function h = circle2(x,y,rx,ry)

@@ -34,6 +34,9 @@ x = mean(classx);
 y = mean(classy);
 H = H -1;
 
+
+end
+
 figure
 hold on
 plot(X(:,1),X(:,2),'.'); %plot
@@ -42,9 +45,6 @@ title('K-Means Unsupervised Learning');
 plot(x(:,1),x(:,2),'x','linewidth',8); %plot
 plot(y(:,1),y(:,2),'x','linewidth',8);
 axis([0 8 0 8]);
-
-end
-
 
 
 hold off
