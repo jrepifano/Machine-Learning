@@ -26,9 +26,8 @@ platypus = double(platypus);
 
 data = [mouse;dog;cat;anolelizard;platypus];
 
-net = selforgmap([5 5]);
+net = selforgmap([3 3],500,3,'gridtop','linkdist');
+net.trainParam.epochs=5000;
 net = train(net,data);
-y = net(data);
-classes = vec2ind(y);
 plotsompos(net,data);
 
