@@ -6,7 +6,7 @@ Sequence = regexprep(Sequence,'N','');
 
 data = [];
 
-k = 8;
+k = 6;
 
 for i = 1:length(Sequence)
     
