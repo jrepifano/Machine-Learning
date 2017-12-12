@@ -1,6 +1,6 @@
 clc; clear all;
 
-data = load('k6.mat');
+data = load('k8.mat');
 data = data.data;
 
 net = selforgmap([20 20],500,3,'gridtop','linkdist');
