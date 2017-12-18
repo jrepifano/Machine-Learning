@@ -11,9 +11,9 @@ k = [2;4;6;8];
 
 for i = 1:4
     
-data = load(['k'...
+data = load(['nk'...
     num2str(k(i)) '.mat']);
-data = data.data;
+data = data.normalizedData;
        
 net = selforgmap([20 20],0,5,'gridtop','linkdist');
 net.trainParam.epochs=5;
