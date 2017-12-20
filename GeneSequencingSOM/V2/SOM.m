@@ -7,7 +7,7 @@ clc; clear all;
 % labels = convertlabels(labels);
 % 
 % performance = [];
-k = [2;4;6;8];
+k = [2;4;6];
 
 for i = 1:4
     
