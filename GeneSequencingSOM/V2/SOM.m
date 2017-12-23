@@ -7,15 +7,15 @@ clc; clear all;
 % labels = convertlabels(labels);
 % 
 % performance = [];
-k = [2;4;6];
+k = [8];
 
-for i = 1:4
+for i = 1:length(k)
     
 data = load(['nk'...
     num2str(k(i)) '.mat']);
 data = data.normalizedData;
        
-net = selforgmap([20 20],0,5,'gridtop','linkdist');
+net = selforgmap([40 40],0,5,'gridtop','linkdist');
 net.trainParam.epochs=5;
 net = train(net,data);
 y = net(data);
