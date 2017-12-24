@@ -1,13 +1,13 @@
 clc; clear all;
 
-% tic
+tic
 % 
 % labels = load('labels.mat');
 % labels = labels.labels;
 % labels = convertlabels(labels);
 % 
 % performance = [];
-k = [8];
+k = [2;4;6;8];          %iterate over all K values to test
 
 for i = 1:length(k)
     
@@ -16,7 +16,7 @@ data = load(['nk'...
 data = data.normalizedData;
        
 net = selforgmap([40 40],0,5,'gridtop','linkdist');
-net.trainParam.epochs=5;
+net.trainParam.epochs=500;
 net = train(net,data);
 y = net(data);
 plotsompos(net,data);
